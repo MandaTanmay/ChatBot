@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EduBot Assistant</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      width: 400px;
+      height: 600px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background-color: #002244;
+      color: white;
+      padding: 15px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .chat-box {
+      flex-grow: 1;
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin: 10px 0;
+    }
+
+    .message.bot {
+      color: #333;
+    }
+
+    .message.user {
+      text-align: right;
+      color: #007bff;
+    }
+
+    .chat-input {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+
+    .chat-input input {
+      flex-grow: 1;
+      border: none;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    .chat-input input:focus {
+      outline: none;
+    }
+
+    .chat-input button {
+      background-color: #002244;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+
+    .option-button {
+      display: block;
+      background-color: #e0ecf8;
+      border: 1px solid #007bff;
+      color: #002244;
+      padding: 8px 12px;
+      margin: 6px 0;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+      width: 100%;
+      text-align: left;
+    }
+
+    .option-button:hover {
+      background-color: #d6eaff;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">SRKRBot Assistant</div>
+    <div class="chat-box" id="chat-box"></div>
+    <div class="chat-input">
+      <input type="text" id="user-input" placeholder="Type a message..." />
+      <button onclick="handleUserInput()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById("chat-box");
+    const userInput = document.getElementById("user-input");
+
+    window.onload = () => {
+      botReply("Hi! Welcome to SRKRBot. How can I help you today?");
+      showMainOptions();
+    };
+
+    function handleUserInput() {
+      const raw = userInput.value;
+      const input = raw.trim();
+      if (!input) return;
+      addMessage(input, "user");
+      userInput.value = "";
+      processInput(input);
+    }
+
+    function addMessage(text, sender) {
+      const msgDiv = document.createElement("div");
+      msgDiv.className = `message ${sender}`;
+      msgDiv.innerHTML = `<strong>${sender === "user" ? "You" : "SRKRChartBot"}:</strong> ${text}`;
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function botReply(text) {
+      addMessage(text, "bot");
+    }
+
+    function showMainOptions() {
+      const div = document.createElement("div");
+      div.className = "message bot";
+      div.innerHTML = `<strong>SRKRBot:</strong> Please select an option: <br>`;
+      ["Academic Details", "Fee Details", "Contact Info"].forEach(option => {
+        const btn = createOption(option, () => processInput(option));
+        div.appendChild(btn);
+      });
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function showAcademicOptions() {
+      const div = document.createElement("div");
+      div.className = "message bot";
+      ["Attendance", "Results", "Time Table", "Backlogs"].forEach(option => {
+        const btn = createOption(option, () => processInput(option));
+        div.appendChild(btn);
+      });
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function processInput(rawInput) {
+      const input = rawInput.trim().toLowerCase();
+      const greetings = ["hello", "hi", "hii", "hey", "good morning", "good evening"];
+
+      if (greetings.includes(input)) {
+        botReply("Hello there! 😊 How can I help you today?");
+        showMainOptions();
+        return;
+      }
+
+      if (input.includes("academic")) {
+        botReply("Please choose an Academic option:");
+        showAcademicOptions();
+        return;
+      }
+
+      switch (input) {
+        case "attendance":
+          botReply("📘 Attendance:<br>Name: Rahul Sharma<br>Reg ID: 22CSD1234<br>Attendance: 87%");
+          break;
+        case "results":
+          botReply("📊 Results:<br>CGPA: 8.7<br>Passed All Subjects");
+          break;
+        case "time table":
+          botReply("🕘 Time Table:<br>Monday to Friday<br>9 AM to 4 PM");
+          break;
+        case "backlogs":
+          botReply("✅ No backlogs found!");
+          break;
+        case "fee details":
+          botReply("💳 Fee Status:<br>Total Paid: ₹85,000<br>No dues remaining.");
+          break;
+        case "contact info":
+          botReply("📞 Contact Info:<br>Email: student.support@college.edu<br>Phone: +91-9876543210");
+          break;
+        default:
+          botReply("Sorry, I didn't understand that. Please select an option below:");
+          showMainOptions();
+      }
+    }
+
+    function createOption(label, callback) {
+      const btn = document.createElement("button");
+      btn.className = "option-button";
+      btn.textContent = label;
+      btn.onclick = callback;
+      return btn;
+    }
+
+    userInput.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        handleUserInput();
+      }
+    });
+  </script>
+</body>
+</html>
